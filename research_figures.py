@@ -214,6 +214,209 @@ def generate_figure4_latency():
     
     return fig
 
+def generate_figure5_student_satisfaction():
+    """
+    Figure 5: Student Satisfaction and Perceived Usefulness
+    Based on surveys of 300 students with satisfaction scores and standard deviations.
+    """
+    # Data from the research results
+    chatbots = ["ChatGPT", "Claude", "Gemini", "Copilot", "Perplexity", "Deepseek"]
+    satisfaction_scores = [4.1, 4.2, 3.9, 3.8, 3.7, 3.5]
+    standard_deviations = [0.5, 0.4, 0.6, 0.5, 0.7, 0.8]
+    
+    # Create the bar chart with error bars
+    fig, ax = plt.subplots(figsize=(12, 8))
+    
+    # Create bars with colors based on performance (higher satisfaction is better)
+    colors = ['#2ECC71', '#27AE60', '#3498DB', '#F39C12', '#E67E22', '#E74C3C']
+    bars = ax.bar(chatbots, satisfaction_scores, yerr=standard_deviations, 
+                  color=colors, alpha=0.8, edgecolor='black', linewidth=1,
+                  capsize=5, error_kw={'ecolor': 'black', 'alpha': 0.7, 'capthick': 2})
+    
+    # Customize the chart
+    ax.set_xlabel('Chatbots', fontweight='bold', fontsize=12)
+    ax.set_ylabel('Puntuación de Satisfacción (0–5)', fontweight='bold', fontsize=12)
+    ax.set_title('Figure 5: Student Satisfaction by Chatbot', fontweight='bold', fontsize=14, pad=20)
+    ax.set_ylim(0, 5)
+    ax.grid(True, alpha=0.3, axis='y')
+    
+    # Add value annotations on bars
+    for bar, score, sd in zip(bars, satisfaction_scores, standard_deviations):
+        height = bar.get_height()
+        ax.annotate(f'{score}\n±{sd}',
+                   xy=(bar.get_x() + bar.get_width() / 2, height),
+                   xytext=(0, 5),  # 5 points vertical offset
+                   textcoords="offset points",
+                   ha='center', va='bottom', fontweight='bold', fontsize=10)
+    
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    
+    # Save the figure
+    data_dir = create_data_directory()
+    save_path = os.path.join(data_dir, 'Figure5_StudentSatisfaction.png')
+    plt.savefig(save_path, dpi=300, bbox_inches='tight', facecolor='white')
+    print(f"Figure 5 saved as: {save_path}")
+    plt.show()
+    
+    return fig
+
+def generate_figure6_usecase_performance():
+    """
+    Figure 6: Use-Case–Specific Performance
+    Shows performance in APA citation, ethical dilemmas, and multi-step reasoning.
+    """
+    # Data from research results
+    categories = ['APA Citation\nAccuracy (%)', 'Ethical Dilemma\nAccuracy (%)', 'Multi-step Reasoning\n(Avg Steps)']
+    
+    # Performance data for each category
+    apa_data = {'Claude': 82, 'ChatGPT': 78, 'Copilot': 70}
+    ethical_data = {'Claude': 90, 'ChatGPT': 85, 'Gemini': 75}
+    reasoning_data = {'Copilot': 4.1, 'Deepseek': 2.6}
+    
+    # Create the grouped bar chart
+    fig, ax = plt.subplots(figsize=(14, 8))
+    
+    # Set up positions for grouped bars
+    x_pos = np.arange(len(categories))
+    bar_width = 0.15
+    
+    # Colors for each chatbot
+    chatbot_colors = {
+        'ChatGPT': '#FF6B6B',
+        'Claude': '#4ECDC4', 
+        'Gemini': '#45B7D1',
+        'Copilot': '#96CEB4',
+        'Perplexity': '#FECA57',
+        'Deepseek': '#FF9FF3'
+    }
+    
+    # Collect all unique chatbots across categories
+    all_chatbots = set()
+    all_chatbots.update(apa_data.keys())
+    all_chatbots.update(ethical_data.keys())
+    all_chatbots.update(reasoning_data.keys())
+    all_chatbots = sorted(list(all_chatbots))
+    
+    # Plot bars for each chatbot
+    for i, chatbot in enumerate(all_chatbots):
+        values = []
+        positions = []
+        
+        # APA Citation
+        if chatbot in apa_data:
+            values.append(apa_data[chatbot])
+            positions.append(x_pos[0] + i * bar_width - (len(all_chatbots)-1) * bar_width / 2)
+        
+        # Ethical Dilemma
+        if chatbot in ethical_data:
+            values.append(ethical_data[chatbot])
+            positions.append(x_pos[1] + i * bar_width - (len(all_chatbots)-1) * bar_width / 2)
+        
+        # Multi-step Reasoning (scale to percentage for consistency)
+        if chatbot in reasoning_data:
+            # Scale reasoning steps to 0-100 scale for better visualization
+            scaled_value = reasoning_data[chatbot] * 20  # 4.1 → 82, 2.6 → 52
+            values.append(scaled_value)
+            positions.append(x_pos[2] + i * bar_width - (len(all_chatbots)-1) * bar_width / 2)
+        
+        if values and positions:
+            bars = ax.bar(positions, values, bar_width, label=chatbot, 
+                         color=chatbot_colors[chatbot], alpha=0.8, edgecolor='black', linewidth=0.5)
+            
+            # Add value annotations
+            for bar, val in zip(bars, values):
+                height = bar.get_height()
+                if bar.get_x() < x_pos[2] + 0.5:  # For APA and Ethical (percentages)
+                    label = f'{int(val)}%'
+                else:  # For reasoning (original values)
+                    original_val = reasoning_data[chatbot]
+                    label = f'{original_val}'
+                ax.annotate(label,
+                           xy=(bar.get_x() + bar.get_width() / 2, height),
+                           xytext=(0, 3),
+                           textcoords="offset points",
+                           ha='center', va='bottom', fontweight='bold', fontsize=9)
+    
+    # Customize the chart
+    ax.set_xlabel('Performance Categories', fontweight='bold', fontsize=12)
+    ax.set_ylabel('Performance Score', fontweight='bold', fontsize=12)
+    ax.set_title('Figure 6: Use-Case–Specific Performance by Chatbot', fontweight='bold', fontsize=14, pad=20)
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels(categories)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.grid(True, alpha=0.3, axis='y')
+    ax.set_ylim(0, 100)
+    
+    # Add note about reasoning scale
+    ax.text(0.02, 0.98, 'Note: Multi-step reasoning shows actual step count', 
+            transform=ax.transAxes, fontsize=9, verticalalignment='top',
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    
+    plt.tight_layout()
+    
+    # Save the figure
+    data_dir = create_data_directory()
+    save_path = os.path.join(data_dir, 'Figure6_UseCasePerformance.png')
+    plt.savefig(save_path, dpi=300, bbox_inches='tight', facecolor='white')
+    print(f"Figure 6 saved as: {save_path}")
+    plt.show()
+    
+    return fig
+
+def generate_figure7_correlation_matrix():
+    """
+    Figure 7: Correlations Between Domains
+    Shows correlation matrix with strong positive correlations between domains.
+    """
+    # Data from research results
+    domains = ['Technical', 'Pedagogical', 'Ethical', 'Psychological', 'IoT Integration']
+    
+    # Create correlation matrix based on research findings
+    correlation_matrix = np.array([
+        [1.00, 0.60, 0.35, 0.94, 0.85],  # Technical
+        [0.60, 1.00, 0.65, 0.90, 0.70],  # Pedagogical  
+        [0.65, 0.65, 1.00, 0.45, 0.40],  # Ethical
+        [0.94, 0.90, 0.45, 1.00, 0.88],  # Psychological
+        [0.85, 0.70, 0.40, 0.88, 1.00]   # IoT Integration
+    ])
+    
+    # Create the heatmap
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    # Create heatmap with divergent colormap centered at 0
+    im = ax.imshow(correlation_matrix, cmap='RdYlBu_r', aspect='auto', vmin=-1, vmax=1)
+    
+    # Set ticks and labels
+    ax.set_xticks(np.arange(len(domains)))
+    ax.set_yticks(np.arange(len(domains)))
+    ax.set_xticklabels(domains, rotation=45, ha='right')
+    ax.set_yticklabels(domains)
+    
+    # Add correlation values to each cell
+    for i in range(len(domains)):
+        for j in range(len(domains)):
+            text = ax.text(j, i, f'{correlation_matrix[i, j]:.2f}',
+                          ha="center", va="center", color="black", fontweight='bold')
+    
+    # Customize the chart
+    ax.set_title('Figure 7: Correlation Matrix of Domain Scores', fontweight='bold', fontsize=14, pad=20)
+    
+    # Add colorbar
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8)
+    cbar.set_label('Correlation Coefficient (r)', fontweight='bold', rotation=270, labelpad=20)
+    
+    plt.tight_layout()
+    
+    # Save the figure
+    data_dir = create_data_directory()
+    save_path = os.path.join(data_dir, 'Figure7_CorrelationMatrix.png')
+    plt.savefig(save_path, dpi=300, bbox_inches='tight', facecolor='white')
+    print(f"Figure 7 saved as: {save_path}")
+    plt.show()
+    
+    return fig
+
 def main():
     """
     Main function to generate all research figures.
@@ -234,6 +437,15 @@ def main():
         
         print("\nGenerating Figure 4: Response Latency...")
         generate_figure4_latency()
+        
+        print("\nGenerating Figure 5: Student Satisfaction...")
+        generate_figure5_student_satisfaction()
+        
+        print("\nGenerating Figure 6: Use-Case-Specific Performance...")
+        generate_figure6_usecase_performance()
+        
+        print("\nGenerating Figure 7: Correlation Matrix...")
+        generate_figure7_correlation_matrix()
         
         print("\n" + "=" * 60)
         print("All research figures have been generated successfully!")

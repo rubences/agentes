@@ -49,11 +49,14 @@ Run the research figures script:
 python research_figures.py
 ```
 
-This will generate four research figures:
+This will generate seven research figures:
 - **Figure 1**: Composite scores by chatbot and domain (grouped bar chart)
 - **Figure 2**: Ethical Compliance Index (ECI) by chatbot (vertical bar chart)
 - **Figure 3**: Perplexity (PPL) by chatbot (bar chart with annotations)
 - **Figure 4**: Response Latency (RL) by chatbot (bar chart with reference line)
+- **Figure 5**: Student Satisfaction by chatbot (bar chart with error bars showing standard deviation)
+- **Figure 6**: Use-Case-Specific Performance (grouped bar chart showing APA citation, ethical dilemmas, and multi-step reasoning)
+- **Figure 7**: Correlation Matrix of Domain Scores (heatmap showing correlations between Technical, Pedagogical, Ethical, Psychological, and IoT Integration domains)
 
 All figures are saved to the `data/` directory as high-resolution PNG files.
 
@@ -71,6 +74,9 @@ The scripts generate:
 - **Figure2_EthicalCompliance.png**: Vertical bar chart showing ECI scores
 - **Figure3_Perplexity.png**: Bar chart with PPL values and annotations
 - **Figure4_Latency.png**: Bar chart with response latency and reference line
+- **Figure5_StudentSatisfaction.png**: Bar chart with student satisfaction scores and error bars showing standard deviations
+- **Figure6_UseCasePerformance.png**: Grouped bar chart showing performance across APA citation tasks, ethical dilemma scenarios, and multi-step reasoning
+- **Figure7_CorrelationMatrix.png**: Heatmap showing correlation matrix between domain scores (Technical, Pedagogical, Ethical, Psychological, IoT Integration)
 
 ## Data Methodology
 
